@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix, classification_report
 
+
 warnings.filterwarnings('ignore')
 
 os.environ.setdefault("SPARK_LOCAL_IP", "127.0.0.1")
@@ -70,7 +71,8 @@ plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
 sns.set_style("whitegrid")
 
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+MONGO_URI = "mongodb+srv://CalvinChen:Aa112211@cluster0.szbiybq.mongodb.net/?appName=Cluster0&tlsInsecure=true"
+
 DB_NAME = "ecommerce_text_classification"
 DASHBOARD_DIR = Path("dashboard_data")
 DASHBOARD_DIR.mkdir(exist_ok=True)
@@ -154,6 +156,7 @@ def load_and_process_data_spark(save_to_mongo=False):
         .config("spark.executor.memory", "2g")
         .config("spark.driver.extraJavaOptions", "-Djava.net.preferIPv4Stack=true")
         .config("spark.executor.extraJavaOptions", "-Djava.net.preferIPv4Stack=true")
+        .config("hadoop.security.authentication", "simple")
         .getOrCreate()
     )
 
@@ -526,13 +529,8 @@ def main():
         return
 
     if mode == "3" and MONGODB_AVAILABLE:
-        print("\n💾 MongoDB Save...")
-        if SPARK_AVAILABLE:
-            spark, df = load_and_process_data_spark(save_to_mongo=True)
-            if spark is not None:
-                spark.stop()
-        else:
-            load_and_process_data_pandas(save_to_mongo=True)
+        print("\n💾 MongoDB Save (Pandas only)...")
+        load_and_process_data_pandas(save_to_mongo=True)
         return
 
     print("\n🚀 Full 3-Class Text Classification Analysis...")
